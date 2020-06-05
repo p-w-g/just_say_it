@@ -4,51 +4,40 @@ const app = express()
 const MongoClient = require('mongodb').MongoClient;
 let ObjectID = require('mongodb').ObjectID
 
+app.use(express.json())
 
 const uri = process.env.DATABASE_URL;
 const client = new MongoClient(uri, { useNewUrlParser: true });
+
 // client.connect(err => {
 //   console.log("Connected correctly to DB");
 //   const collection = client.db("datastore").collection("messages");
 
-// perform actions on the collection object
+//   // perform actions on the collection object
 
-// // add a record
-// collection.insertOne({
-//   name: 'anon', message: 'lorem ipsum dolor sit amet'
-// })
+//   // // add a record
+//   // collection.insertOne({
+//   //   name: 'anon', message: 'lorem ipsum dolor sit amet'
+//   // })
 
-// collection.insertMany([
-//   {
-//     name: 'anon1',
-//     message: 'lorem ipsum dolor sit amet'
-//   },
-//   {
-//     name: 'anon2',
-//     message: 'lorem ipsum dolor sit amet'
-//   },
-//   {
-//     name: 'anon3',
-//     message: 'lorem ipsum dolor sit amet'
-//   },
-//   {
-//     name: 'anon1',
-//     message: 'lorem ipsum dolor sit amet'
-//   }])
+//   // collection.insertMany([
+//   //   {
+//   //     name: 'anon1',
+//   //     message: 'lorem ipsum dolor sit amet'
+//   //   },
+//   //   {
+//   //     name: 'anon2',
+//   //     message: 'lorem ipsum dolor sit amet'
+//   //   },
+//   //   {
+//   //     name: 'anon3',
+//   //     message: 'lorem ipsum dolor sit amet'
+//   //   },
+//   //   {
+//   //     name: 'anon1',
+//   //     message: 'lorem ipsum dolor sit amet'
+//   //   }])
 
-
-// // read all records
-// let allMessages = collection.find({})
-
-// function iterateFunc(doc) {
-//   console.log(JSON.stringify(doc, null, 4));
-// }
-
-// function errorFunc(error) {
-//   console.log(error);
-// }
-
-// allMessages.forEach(iterateFunc, errorFunc)
 
 // update a record
 // let promisifyUpdate = () => {
@@ -75,58 +64,44 @@ const client = new MongoClient(uri, { useNewUrlParser: true });
 //   client.close()
 // })
 
-// collection.updateMany({ name: 'anon2' }, { $set: { message: 'this user was banned and messages were deleted' } })
+//   // collection.updateMany({ name: 'anon2' }, { $set: { message: 'this user was banned and messages were deleted' } })
 
 
-// remove a record
-// collection.deleteOne({ "_id": ObjectID("5ed76c27a2a8ea15ccbf532c") })
-// collection.deleteMany({name: 'anon1'})
+//   // remove a record
+//   // collection.deleteOne({ "_id": ObjectID("5ed76c27a2a8ea15ccbf532c") })
+//   // collection.deleteMany({name: 'anon1'})
 
 //   client.close();
 //   console.log("closed the connection to DB")
+//  console.log("after loop", data);
 // });
 
 
-
-// const io = require('socket.io')()
-
-// app.use(express.static('public'))
-
 // routes
-app.get('/', (req, res) => {
-  // res.render(JSON.stringify(allMessages, null, 4))
-  // res.send(allMessages)
-  // console.log("all messages", messageString)
+app.get('/', async (req, res) => {
   client.connect(err => {
     console.log("Connected correctly to DB");
     const collection = client.db("datastore").collection("messages");
-    if (err) {
-      console.log(err)
+
+    function promisedRecords() {
+      return new Promise((res, rej) => {
+        res(collection.find().toArray())
+      })
     }
-    // read all records
-    let messageString
-    let allMessages = collection.find().toArray( (err, result) => {
-      if (err) throw err
 
-      return result
-    } )
-
-    // function iterateFunc(doc) {
-    //   console.log("im in iterate func", doc)
-    //   messageString = JSON.stringify(doc, null, 2)
-    // }
-
-    // function errorFunc(error) {
-    //   console.log(error);
-    // }
-
-    // allMessages.forEach(iterateFunc, errorFunc)
-
+    promisedRecords()
+      .then((response) => {
+        res.send(response)
+      })
+      .then(() => {
+        console.log("sent payload, closing client")
+        return client.close();
+      })
+      .catch((err) => {
+        console.error(err, "something broke")
+      })
 
     client.close();
-    console.log("closed the connection to DB")
-    console.log("message string", allMessages)
-    res.json(allMessages)
   });
 })
 
@@ -139,5 +114,4 @@ server = app.listen(3000, () => {
 // // connection listener
 // io.on('connection', (socket) => {
 //   console.log('New user connected');
-
 // })
