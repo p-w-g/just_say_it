@@ -6,7 +6,7 @@
   "scripts": {
     "start": "nodemon app"
   },
-  "author": "",
+  "author": "Przemek Grzelczyk",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",

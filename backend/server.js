@@ -106,7 +106,7 @@ app.get('/', async (req, res) => {
 })
 
 // port
-server = app.listen(3000, () => {
+server = app.listen(8080, () => {
   console.log('server is running on port', server.address().port)
 })
 

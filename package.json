@@ -1,0 +1,19 @@
+{
+  "name": "just_say_it",
+  "version": "1.0.0",
+  "description": "MERN stack chat app.",
+  "scripts": {
+    "serve:be": "cd backend && node server.js",
+    "serve:fe": "cd frontend && npm run start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/p-w-g/just_say_it.git"
+  },
+  "author": "Przemek Grzelczyk",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/p-w-g/just_say_it/issues"
+  },
+  "homepage": "https://github.com/p-w-g/just_say_it#readme"
+}
