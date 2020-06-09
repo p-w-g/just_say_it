@@ -78,10 +78,13 @@ const client = new MongoClient(uri, { useNewUrlParser: true });
 
 
 // routes
-app.get('/', async (req, res) => {
+app.get('/api/messages', async (req, res) => {
+
   client.connect(err => {
     console.log("Connected correctly to DB");
     const collection = client.db("datastore").collection("messages");
+
+    if (err) return console.error(err);
 
     function promisedRecords() {
       return new Promise((res, rej) => {
@@ -91,18 +94,14 @@ app.get('/', async (req, res) => {
 
     promisedRecords()
       .then((response) => {
-        res.send(response)
-      })
-      .then(() => {
+        res.send({ dataset: response })
         console.log("sent payload, closing client")
-        return client.close();
       })
       .catch((err) => {
-        console.error(err, "something broke")
+        console.error(err, "something broke in Mongo most likely")
       })
-
-    client.close();
   });
+  client.close();
 })
 
 // port

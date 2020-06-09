@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "MERN stack chat app.",
   "scripts": {
-    "serve:be": "cd backend && node server.js",
-    "serve:fe": "cd frontend && npm run start"
+    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
+    "server": "cd backend && node server.js",
+    "client": "cd frontend && npm run start"
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,9 @@
   "bugs": {
     "url": "https://github.com/p-w-g/just_say_it/issues"
   },
-  "homepage": "https://github.com/p-w-g/just_say_it#readme"
+  "homepage": "https://github.com/p-w-g/just_say_it#readme",
+  "devDependencies": {
+    "concurrently": "^5.2.0",
+    "nodemon": "^2.0.4"
+  }
 }
