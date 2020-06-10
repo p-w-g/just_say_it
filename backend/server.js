@@ -6,8 +6,7 @@ let ObjectID = require('mongodb').ObjectID
 
 app.use(express.json())
 
-const uri = process.env.DATABASE_URL;
-const client = new MongoClient(uri, { useNewUrlParser: true });
+
 
 // client.connect(err => {
 //   console.log("Connected correctly to DB");
@@ -79,29 +78,20 @@ const client = new MongoClient(uri, { useNewUrlParser: true });
 
 // routes
 app.get('/api/messages', async (req, res) => {
+  const uri = process.env.DATABASE_URL;
+  const client = new MongoClient(uri, { useNewUrlParser: true });
 
-  client.connect(err => {
+  client.connect(async err => {
     console.log("Connected correctly to DB");
-    const collection = client.db("datastore").collection("messages");
-
     if (err) return console.error(err);
-
-    function promisedRecords() {
-      return new Promise((res, rej) => {
-        res(collection.find().toArray())
-      })
-    }
-
-    promisedRecords()
-      .then((response) => {
-        res.send({ dataset: response })
-        console.log("sent payload, closing client")
-      })
-      .catch((err) => {
-        console.error(err, "something broke in Mongo most likely")
-      })
+    
+    const collection = await client.db("datastore").collection("messages");
+    const queryAll = await collection.find().toArray() 
+    res.send({ dataset: queryAll })
+    console.log("sent data");
+    client.close();
+    console.log("closed the client");
   });
-  client.close();
 })
 
 // port
