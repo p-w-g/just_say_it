@@ -23,7 +23,7 @@ class NameForm extends React.Component {
     event.preventDefault();
 
     await this.nameCheck(this.state.value) ? this.signIn(event)
-      : console.error("Something went massively wrong.")
+      : console.error("Something went wrong.")
   }
 
   nameCheck = name => {
@@ -44,7 +44,6 @@ class NameForm extends React.Component {
     if (body.response === 'Username Already Taken') {
       return alert('Username Already Taken')
     }
-    console.log("do i get a server response?", body)
   }
   render() {
     return (
