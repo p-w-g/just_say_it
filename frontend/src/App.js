@@ -2,50 +2,60 @@ import React, { Component } from 'react';
 import './App.css';
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isLoading: true
-    }
-
-  }
-  componentDidMount() {
-    this.fetchAllMessages()
-  };
-
-
-  fetchAllMessages = async () => {
-    const response = await fetch('/api/messages');
-    const body = await response.json();
-
-    if (response.status !== 200) throw Error(body.message);
-    this.setState({ allMessages: body.dataset, isLoading: false })
-  }
-
   render() {
     return (
       <div className="App">
-
-        <p>Here be my messages</p>
-        <p>if I had any</p>
-        <div >
-          {!this.state.isLoading &&
-            this.state.allMessages.map((post, index) =>
-              <article key={index}>
-                <h3>
-                  {post.name}
-                </h3>
-                <p>
-                  {post.message}
-                </p>
-              </article>
-            )}
-        </div>
-
-
-      </div>
+        <NameForm></NameForm>
+      </div >
     );
   }
 };
+class NameForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { value: '' };
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleChange(event) { this.setState({ value: event.target.value }); }
+  handleSubmit = async (event) => {
+    event.preventDefault();
+
+    await this.nameCheck(this.state.value) ? this.signIn(event)
+      : console.error("Something went massively wrong.")
+  }
+
+  nameCheck = name => {
+    if (!name) return alert("Missing name")
+    if (name === '') return alert("Missing name")
+    if (name.match(/[^A-Za-z0-9]+/g)) return alert("Invalid name, use only letters and numbers")
+    return true
+  }
+  signIn = async e => {
+   const response = await fetch('/api/names', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name: this.state.value }),
+    });
+    const body = await response.json();
+    if (body.response === 'Username Already Taken') {
+      return alert('Username Already Taken')
+    }
+    console.log("do i get a server response?", body)
+  }
+  render() {
+    return (
+      <form onSubmit={this.handleSubmit}>
+        <label>
+          Name:
+          <input type="text" value={this.state.value} onChange={this.handleChange} />        </label>
+        <input type="submit" value="Submit" />
+      </form>
+    );
+  }
+}
 
 export default App;

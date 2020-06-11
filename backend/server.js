@@ -6,77 +6,8 @@ let ObjectID = require('mongodb').ObjectID
 
 app.use(express.json())
 
-
-
-// client.connect(err => {
-//   console.log("Connected correctly to DB");
-//   const collection = client.db("datastore").collection("messages");
-
-//   // perform actions on the collection object
-
-//   // // add a record
-//   // collection.insertOne({
-//   //   name: 'anon', message: 'lorem ipsum dolor sit amet'
-//   // })
-
-//   // collection.insertMany([
-//   //   {
-//   //     name: 'anon1',
-//   //     message: 'lorem ipsum dolor sit amet'
-//   //   },
-//   //   {
-//   //     name: 'anon2',
-//   //     message: 'lorem ipsum dolor sit amet'
-//   //   },
-//   //   {
-//   //     name: 'anon3',
-//   //     message: 'lorem ipsum dolor sit amet'
-//   //   },
-//   //   {
-//   //     name: 'anon1',
-//   //     message: 'lorem ipsum dolor sit amet'
-//   //   }])
-
-
-// update a record
-// let promisifyUpdate = () => {
-//   return new Promise((res, rej) => {
-//     res(collection
-//       .updateOne(
-//         { "_id": ObjectID("5ed76c27a2a8ea15ccbf532b") },
-//         {
-//           $set: { 'message': 'This message was modified by the object' }
-//         }
-//       )
-//     )
-//     rej(err, client.close())
-
-//   })
-// }
-
-// let promiseCall = async () => {
-//   let result = await (promisifyUpdate())
-//   return result
-// }
-
-// promiseCall().then(result => {
-//   client.close()
-// })
-
-//   // collection.updateMany({ name: 'anon2' }, { $set: { message: 'this user was banned and messages were deleted' } })
-
-
-//   // remove a record
-//   // collection.deleteOne({ "_id": ObjectID("5ed76c27a2a8ea15ccbf532c") })
-//   // collection.deleteMany({name: 'anon1'})
-
-//   client.close();
-//   console.log("closed the connection to DB")
-//  console.log("after loop", data);
-// });
-
-
 // routes
+// fetch all messages
 app.get('/api/messages', async (req, res) => {
   const uri = process.env.DATABASE_URL;
   const client = new MongoClient(uri, { useNewUrlParser: true });
@@ -84,9 +15,9 @@ app.get('/api/messages', async (req, res) => {
   client.connect(async err => {
     console.log("Connected correctly to DB");
     if (err) return console.error(err);
-    
+
     const collection = await client.db("datastore").collection("messages");
-    const queryAll = await collection.find().toArray() 
+    const queryAll = await collection.find().toArray()
     res.send({ dataset: queryAll })
     console.log("sent data");
     client.close();
@@ -94,13 +25,27 @@ app.get('/api/messages', async (req, res) => {
   });
 })
 
+// sign in a new user
+app.post('/api/names', async (req, res) => {
+  await userSignIn(req.body.name) ? res.send({ response: "I gotchu fam" }) : res.send({ response: "Username Already Taken" });
+
+})
 // port
 server = app.listen(8080, () => {
   console.log('server is running on port', server.address().port)
 })
 
 
-// // connection listener
-// io.on('connection', (socket) => {
-//   console.log('New user connected');
-// })
+// TODO: move helpers to separate file
+let activeUsers = []
+
+function userSignIn(name) {
+  if (!name) return console.log("Missing name")
+  if (name === '') return console.log("Missing name")
+  if (name.match(/[^A-Za-z0-9]+/g)) return console.log("Invalid name, use only letters and numbers")
+  if (activeUsers.includes(name)) return console.log("Username already taken");
+
+  activeUsers.push(name)
+  console.log('This name was added to active users: ', name)
+  return true
+}
