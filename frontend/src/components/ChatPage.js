@@ -51,9 +51,31 @@ class PostForm extends React.Component {
   }
 
   handleChange(event) { this.setState({ value: event.target.value }); }
-  handleSubmit(event) {
-    alert('Pushed this: ' + this.state.value);
+  handleSubmit = async (event) => {
     event.preventDefault();
+
+    await this.postThePost()
+    // await this.postCheck(this.state.value) ? this.postThePost() : console.error("Something went wrong.")
+  }
+
+  postCheck = content => {
+    if (!content) return alert("Missing content")
+    if (content === '') return alert("Missing content")
+    // if (content.match(/[^A-Za-z0-9,.& ']+/g)) return alert("Only alphanumeric characters and: , ' &")
+
+    return true
+  }
+
+  postThePost = async content => {
+    const response = await fetch('/api/posts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ message: this.state.value }),
+    });
+    const body = await response.json();
+    console.log(body)
   }
 
   render() {

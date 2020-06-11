@@ -11,7 +11,7 @@ class NameForm extends React.Component {
   handleChange(event) { this.setState({ value: event.target.value }); }
   handleSubmit = async (event) => {
     event.preventDefault();
-    
+
     await this.nameCheck(this.state.value) ? this.signIn(event)
       : console.error("Something went wrong.")
   }
