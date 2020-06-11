@@ -1,3 +1,5 @@
+import React, { Component } from 'react';
+
 class ChatPage extends React.Component {
   constructor(props) {
     super(props);
