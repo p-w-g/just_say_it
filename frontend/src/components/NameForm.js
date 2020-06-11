@@ -11,7 +11,7 @@ class NameForm extends React.Component {
   handleChange(event) { this.setState({ value: event.target.value }); }
   handleSubmit = async (event) => {
     event.preventDefault();
-
+    
     await this.nameCheck(this.state.value) ? this.signIn(event)
       : console.error("Something went wrong.")
   }
@@ -20,6 +20,7 @@ class NameForm extends React.Component {
     if (!name) return alert("Missing name")
     if (name === '') return alert("Missing name")
     if (name.match(/[^A-Za-z0-9]+/g)) return alert("Invalid name, use only letters and numbers")
+
     return true
   }
   signIn = async e => {
@@ -31,16 +32,19 @@ class NameForm extends React.Component {
       body: JSON.stringify({ name: this.state.value }),
     });
     const body = await response.json();
+
     if (body.response === 'Username Already Taken') {
       return alert('Username Already Taken')
     }
+    this.props.forceLogin()
   }
   render() {
     return (
       <form onSubmit={this.handleSubmit}>
         <label>
           Name:
-          <input type="text" value={this.state.value} onChange={this.handleChange} />        </label>
+          <input type="text" value={this.state.value} onChange={this.handleChange} />
+        </label>
         <input type="submit" value="Submit" />
       </form>
     );
