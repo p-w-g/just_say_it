@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 class ChatPage extends React.Component {
   constructor(props) {
@@ -6,11 +6,14 @@ class ChatPage extends React.Component {
     this.state = {
       isLoading: true
     }
+    this.handleLogout = this.handleLogout.bind(this);
   }
   componentDidMount() {
     this.fetchAllMessages()
   };
-
+  handleLogout() {
+    this.props.forceLogout()
+  }
   fetchAllMessages = async () => {
     const response = await fetch('/api/messages');
     const body = await response.json();
@@ -32,35 +35,37 @@ class ChatPage extends React.Component {
               </p>
             </article>
           )}
+        <PostForm />
+        <button onClick={this.handleLogout}> Let Me Out!</button>
       </div>
     );
   }
 }
-// class EssayForm extends React.Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = { value: 'Please write an essay about your favorite DOM element.' };
-//     this.handleChange = this.handleChange.bind(this);
-//     this.handleSubmit = this.handleSubmit.bind(this);
-//   }
 
-//   handleChange(event) { this.setState({ value: event.target.value }); }
-//   handleSubmit(event) {
-//     alert('An essay was submitted: ' + this.state.value);
-//     event.preventDefault();
-//   }
+class PostForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { value: '' };
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
 
-//   render() {
-//     return (
-//       <form onSubmit={this.handleSubmit}>
-//         <label>
-//           Essay:
-//           <textarea value={this.state.value} onChange={this.handleChange} />
-//         </label>
-//         <input type="submit" value="Submit" />
-//       </form>
-//     );
-//   }
-// }
+  handleChange(event) { this.setState({ value: event.target.value }); }
+  handleSubmit(event) {
+    alert('Pushed this: ' + this.state.value);
+    event.preventDefault();
+  }
+
+  render() {
+    return (
+      <form onSubmit={this.handleSubmit}>
+        <label>
+          <textarea value={this.state.value} onChange={this.handleChange} />
+        </label>
+        <input type="submit" value="Submit" />
+      </form>
+    );
+  }
+}
 
 export default ChatPage;

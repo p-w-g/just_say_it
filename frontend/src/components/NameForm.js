@@ -23,7 +23,7 @@ class NameForm extends React.Component {
 
     return true
   }
-  signIn = async e => {
+  signIn = async () => {
     const response = await fetch('/api/names', {
       method: 'POST',
       headers: {

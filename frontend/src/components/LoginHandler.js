@@ -22,7 +22,7 @@ class LoginHandler extends Component {
     return (
       <div>
         {
-          this.state.isLoggedIn ? <ChatPage />
+          this.state.isLoggedIn ? <ChatPage forceLogout={this.handleLogoutClick.bind(this)} />
             : <NameForm forceLogin={this.handleLoginClick.bind(this)} />
         }
       </div>
