@@ -1,5 +1,6 @@
 import React from 'react';
-
+import { useStore } from '../Store'
+const [store, setStore] = useStore();
 class ChatPage extends React.Component {
   constructor(props) {
     super(props);
@@ -9,7 +10,7 @@ class ChatPage extends React.Component {
     this.handleLogout = this.handleLogout.bind(this);
   }
   componentDidMount() {
-    this.fetchAllMessages()
+    this.fetchAllMessages()    
   };
   handleLogout() {
     this.props.forceLogout()
@@ -72,10 +73,9 @@ class PostForm extends React.Component {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ message: this.state.value }),
+      body: JSON.stringify({ name: store().name, message: this.state.value }),
     });
     const body = await response.json();
-    console.log(body)
   }
 
   render() {

@@ -1,4 +1,6 @@
 import React from 'react';
+import { useStore } from '../Store'
+const [store, setStore] = useStore();
 
 class NameForm extends React.Component {
   constructor(props) {
@@ -8,7 +10,9 @@ class NameForm extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleChange(event) { this.setState({ value: event.target.value }); }
+  handleChange(event) {
+    this.setState({ value: event.target.value });
+  }
   handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -36,6 +40,7 @@ class NameForm extends React.Component {
     if (body.response === 'Username Already Taken') {
       return alert('Username Already Taken')
     }
+    setStore({ name: this.state.value })
     this.props.forceLogin()
   }
   render() {
