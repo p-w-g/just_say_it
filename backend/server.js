@@ -40,7 +40,7 @@ app.post('/api/posts', async (req, res) => {
     const collection = await client.db("datastore").collection("messages");
     console.log("Connected correctly to DB IN POSTS");
     await collection.insertOne({
-      name: 'dummy', message: req.body.message
+      name: req.body.name, message: req.body.message
     })
 
     const queryAll = await collection.find().toArray()
