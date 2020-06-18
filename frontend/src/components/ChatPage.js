@@ -1,6 +1,12 @@
 import React from 'react';
 import { useStore } from '../Store'
+import io from 'socket.io-client'
+
+
 const [store, setStore] = useStore();
+const socket = io()
+
+
 class ChatPage extends React.Component {
   constructor(props) {
     super(props);
@@ -9,19 +15,35 @@ class ChatPage extends React.Component {
     }
     this.handleLogout = this.handleLogout.bind(this);
   }
+
   componentDidMount() {
-    this.fetchAllMessages()    
+    this.fetchAllMessages()
+    this.initSocket()
   };
+
   handleLogout() {
     this.props.forceLogout()
   }
+
   fetchAllMessages = async () => {
     const response = await fetch('/api/messages');
     const body = await response.json();
-
+    
     if (response.status !== 200) throw Error(body.message);
     this.setState({ allMessages: body.dataset, isLoading: false })
   }
+
+  initSocket = () => {
+    socket.on('connect', () => {
+      console.log("init of socket.io in postform");
+    })
+    socket.on('all-messages', (msgs) => {
+      this.setState({
+        allMessages: msgs.dataset
+      })
+    })
+  }
+
   render() {
     return (
       <div >
@@ -67,15 +89,18 @@ class PostForm extends React.Component {
     return true
   }
 
+  initSocket = () => {
+    socket.on('connect', () => {
+      console.log("init of socket.io in postform");
+    })
+  }
+
+  componentDidMount() {
+    this.initSocket()
+  };
+
   postThePost = async content => {
-    const response = await fetch('/api/posts', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ name: store().name, message: this.state.value }),
-    });
-    const body = await response.json();
+    socket.emit('chat message', ({ name: store().name, message: this.state.value }))
   }
 
   render() {

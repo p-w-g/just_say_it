@@ -1,9 +1,54 @@
 require('dotenv').config()
+const http = require("http");
 const express = require('express')
-const helpers = require('./helpers')
+const helpers = require('./helpers');
 const app = express()
 const MongoClient = require('mongodb').MongoClient;
-let ObjectID = require('mongodb').ObjectID
+const ObjectID = require('mongodb').ObjectID
+const socketIo = require("socket.io");
+
+
+
+const port = process.env.PORT || 8080;
+const server = http.createServer(app);
+server.listen(port, () => console.log(`Listening on port ${port}`));
+const io = socketIo(server)
+
+io.on("connection", (socket) => {
+  const uri = process.env.DATABASE_URL;
+  const client = new MongoClient(uri, { useNewUrlParser: true });
+
+  client.connect(async err => {
+    const collection = await client.db("datastore").collection("messages");
+
+    socket.on('chat message', async (msg) => {
+      await collection.insertOne(msg)
+    });
+
+
+    // socket.broadcast.emit('all messages here')
+    const changestream = await collection.watch()
+
+    changestream.on('change', async next => {
+      const queryAll = await collection.find().toArray()
+
+      socket.emit('all-messages', { dataset: queryAll })
+    })
+  });
+  socket.on('disconnect', () => {
+    // close DB connection here
+    console.log('SOCKET client disconnected')
+  })
+})
+
+const getApiAndEmit = socket => {
+  const response = new Date();
+  // Emitting a new message. Will be consumed by the client
+  socket.emit("FromAPI", response);
+};
+
+const uri = process.env.DATABASE_URL;
+const client = new MongoClient(uri, { useNewUrlParser: true });
 
 app.use(express.json())
 
@@ -19,6 +64,7 @@ app.get('/api/messages', async (req, res) => {
 
     const collection = await client.db("datastore").collection("messages");
     const queryAll = await collection.find().toArray()
+
     res.send({ dataset: queryAll })
     console.log("sent data");
     client.close();
@@ -43,18 +89,11 @@ app.post('/api/posts', async (req, res) => {
       name: req.body.name, message: req.body.message
     })
 
-    const queryAll = await collection.find().toArray()
-    await res.send({ dataset: queryAll })
-    console.log("sent data");
     client.close();
     console.log("closed the client");
   });
 })
 
 
-// port
-server = app.listen(8080, () => {
-  console.log('server is running on port', server.address().port)
-})
 
 

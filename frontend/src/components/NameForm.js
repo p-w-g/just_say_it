@@ -1,7 +1,6 @@
 import React from 'react';
 import { useStore } from '../Store'
 const [store, setStore] = useStore();
-
 class NameForm extends React.Component {
   constructor(props) {
     super(props);
