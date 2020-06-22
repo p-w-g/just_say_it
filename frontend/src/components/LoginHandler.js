@@ -20,12 +20,13 @@ class LoginHandler extends Component {
 
   render() {
     return (
-      <div>
+      <div class="container-fluid d-flex justify-content-center align-items-center">
         {
           this.state.isLoggedIn ? <ChatPage forceLogout={this.handleLogoutClick.bind(this)} />
             : <NameForm forceLogin={this.handleLoginClick.bind(this)} />
         }
-      </div>
+
+      </div >
     );
   }
 }

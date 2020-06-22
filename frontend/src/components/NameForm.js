@@ -44,12 +44,12 @@ class NameForm extends React.Component {
   }
   render() {
     return (
-      <form onSubmit={this.handleSubmit}>
+      <form onSubmit={this.handleSubmit} class="d-flex">
         <label>
           Name:
-          <input type="text" value={this.state.value} onChange={this.handleChange} />
         </label>
-        <input type="submit" value="Submit" />
+        <input type="text" class="breathe form-control form-control-sm" value={this.state.value} onChange={this.handleChange} />
+        <input type="submit" class="breathe btn btn-outline-info btn-sm" value="Send" />
       </form>
     );
   }

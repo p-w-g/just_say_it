@@ -28,7 +28,7 @@ class ChatPage extends React.Component {
   fetchAllMessages = async () => {
     const response = await fetch('/api/messages');
     const body = await response.json();
-    
+
     if (response.status !== 200) throw Error(body.message);
     this.setState({ allMessages: body.dataset, isLoading: false })
   }
@@ -46,20 +46,25 @@ class ChatPage extends React.Component {
 
   render() {
     return (
-      <div >
-        {!this.state.isLoading &&
-          this.state.allMessages.map((post, index) =>
-            <article key={index}>
-              <h3>
-                {post.name}
-              </h3>
-              <p>
-                {post.message}
-              </p>
-            </article>
-          )}
+      <div class="col-lg-6 col-12 col-md-10 col-sm-12">
+        <ul class="list-group list-group-flush message-feed">
+
+          {!this.state.isLoading &&
+            this.state.allMessages.map((post, index) =>
+              <li class="list-group-item " key={index}>
+                <h5 class="mb-1">{post.name}</h5>
+                <p class="mb-1">{post.message}</p>
+              </li>
+            )}
+        </ul>
         <PostForm />
-        <button onClick={this.handleLogout}> Let Me Out!</button>
+        <form>
+          <label>
+            logged in as  <h5 class="mb-1">{store().name}</h5>
+          </label>
+          <button class="btn btn-outline-danger btn-sm breathe" onClick={this.handleLogout}> Leave</button>
+        </form>
+
       </div>
     );
   }
@@ -78,6 +83,8 @@ class PostForm extends React.Component {
     event.preventDefault();
 
     await this.postThePost()
+
+    document.querySelector('#chat-input').value = '';
     // await this.postCheck(this.state.value) ? this.postThePost() : console.error("Something went wrong.")
   }
 
@@ -105,11 +112,11 @@ class PostForm extends React.Component {
 
   render() {
     return (
-      <form onSubmit={this.handleSubmit}>
+      <form onSubmit={this.handleSubmit} class="">
         <label>
-          <textarea value={this.state.value} onChange={this.handleChange} />
+          <input class="form-control form-control-sm" onChange={this.handleChange} id="chat-input" />
         </label>
-        <input type="submit" value="Submit" />
+        <input type="submit" value="Send" class="btn btn-outline-info btn-sm btn-fix" />
       </form>
     );
   }
