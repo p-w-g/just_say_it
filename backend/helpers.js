@@ -11,5 +11,11 @@ function userSignIn(name) {
   return true
 }
 
+function userSignOut(name) {
+  activeUsers.splice(activeUsers.indexOf(name), 1)
+  console.log('This name was removed to active users: ', name)
+}
+
 exports.activeUsers = activeUsers;
 exports.userSignIn = userSignIn;
+exports.userSignOut = userSignOut;

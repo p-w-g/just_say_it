@@ -23,20 +23,31 @@ class ChatPage extends React.Component {
   componentDidUpdate() {
     this.scrollToBottom()
   }
-  
+
   handleLogout() {
     this.props.forceLogout()
+    this.signOut()
   }
-  
+
   scrollToBottom = () => {
     console.log()
     document.querySelectorAll(".chat-message")[document.querySelectorAll(".chat-message").length - 1].scrollIntoView({ behavior: "smooth" })
   }
-  
+
+  signOut = async () => {
+    await fetch('/api/names', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name: store().name }),
+    });
+  }
+
   fetchAllMessages = async () => {
     const response = await fetch('/api/messages');
     const body = await response.json();
-    
+
     if (response.status !== 200) throw Error(body.message);
     this.setState({ allMessages: body.dataset, isLoading: false })
     await this.scrollToBottom()
