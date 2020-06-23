@@ -1,6 +1,7 @@
 import React from 'react';
 import { useStore } from '../Store'
 const [store, setStore] = useStore();
+
 class NameForm extends React.Component {
   constructor(props) {
     super(props);
@@ -12,6 +13,7 @@ class NameForm extends React.Component {
   handleChange(event) {
     this.setState({ value: event.target.value });
   }
+
   handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -26,6 +28,7 @@ class NameForm extends React.Component {
 
     return true
   }
+
   signIn = async () => {
     const response = await fetch('/api/names', {
       method: 'POST',
@@ -42,6 +45,7 @@ class NameForm extends React.Component {
     setStore({ name: this.state.value })
     this.props.forceLogin()
   }
+
   render() {
     return (
       <form onSubmit={this.handleSubmit} class="d-flex">
