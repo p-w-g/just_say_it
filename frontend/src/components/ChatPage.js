@@ -6,7 +6,6 @@ import io from 'socket.io-client'
 const [store, setStore] = useStore();
 const socket = io()
 
-
 class ChatPage extends React.Component {
   constructor(props) {
     super(props);
@@ -21,16 +20,26 @@ class ChatPage extends React.Component {
     this.initSocket()
   };
 
+  componentDidUpdate() {
+    this.scrollToBottom()
+  }
+  
   handleLogout() {
     this.props.forceLogout()
   }
-
+  
+  scrollToBottom = () => {
+    console.log()
+    document.querySelectorAll(".chat-message")[document.querySelectorAll(".chat-message").length - 1].scrollIntoView({ behavior: "smooth" })
+  }
+  
   fetchAllMessages = async () => {
     const response = await fetch('/api/messages');
     const body = await response.json();
-
+    
     if (response.status !== 200) throw Error(body.message);
     this.setState({ allMessages: body.dataset, isLoading: false })
+    await this.scrollToBottom()
   }
 
   initSocket = () => {
@@ -51,7 +60,7 @@ class ChatPage extends React.Component {
 
           {!this.state.isLoading &&
             this.state.allMessages.map((post, index) =>
-              <li class="list-group-item " key={index}>
+              <li class="list-group-item chat-message" key={index}>
                 <h5 class="mb-1">{post.name}</h5>
                 <p class="mb-1">{post.message}</p>
               </li>
