@@ -7,19 +7,30 @@ const MongoClient = require('mongodb').MongoClient;
 const ObjectID = require('mongodb').ObjectID
 const socketIo = require("socket.io");
 
-// #todo:
-// logout due inactivity
-// logout on request
-// toast - broadcast recent active users
 
 const port = process.env.PORT || 8080;
 const server = http.createServer(app);
 server.listen(port, () => console.log(`Listening on port ${port}`));
 const io = socketIo(server)
+app.use(express.json())
+
 
 io.on("connection", (socket) => {
   const uri = process.env.DATABASE_URL;
   const client = new MongoClient(uri, { useNewUrlParser: true });
+
+  app.post('/api/names', async (req, res) => {
+    console.log("User logged as: ", req.body.name)
+    await helpers.userSignIn(req.body.name) ? res.send({ response: "I gotchu fam" }) : res.send({ response: "Username Already Taken" });
+    socket.emit('user-login', { name: req.body.name })
+  })
+
+  // signout user
+  app.patch('/api/names', async (req, res) => {
+    console.log("User logged out: ", req.body.name)
+    await helpers.userSignOut(req.body.name)
+    socket.emit('user-logout', { name: req.body.name })
+  })
 
   client.connect(async err => {
     console.log('Socket connected to DB')
@@ -30,7 +41,6 @@ io.on("connection", (socket) => {
     });
 
 
-    // socket.broadcast.emit('all messages here')
     const changestream = await collection.watch()
 
     changestream.on('change', async next => {
@@ -44,11 +54,6 @@ io.on("connection", (socket) => {
     console.log('SOCKET client disconnected')
   })
 })
-
-const uri = process.env.DATABASE_URL;
-const client = new MongoClient(uri, { useNewUrlParser: true });
-
-app.use(express.json())
 
 // routes
 // fetch all messages
@@ -69,18 +74,6 @@ app.get('/api/messages', async (req, res) => {
     client.close();
     console.log("closed the client");
   });
-})
-
-// sign in a new user
-app.post('/api/names', async (req, res) => {
-  console.log("User logged as: ", req.body.name)
-  await helpers.userSignIn(req.body.name) ? res.send({ response: "I gotchu fam" }) : res.send({ response: "Username Already Taken" });
-})
-
-// signout user
-app.patch('/api/names', async (req, res) => {
-  console.log("User logged out: ", req.body.name)
-  await helpers.userSignOut(req.body.name)
 })
 
 // post new posts
