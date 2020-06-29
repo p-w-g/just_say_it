@@ -34,7 +34,8 @@ class PostForm extends React.Component {
   };
 
   postThePost = async content => {
-    socket.emit('chat message', ({ name: store().name, message: this.state.value }))
+    // TODO: replace store.name with redux.store
+    // socket.emit('chat message', ({ name: store().name, message: this.state.value }))
   }
 
   render() {

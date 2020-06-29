@@ -1,11 +1,9 @@
 import React from 'react';
-import { useStore } from '../Store'
 import io from 'socket.io-client'
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 import PostForm from './PostForm'
 
-const [store, setStore] = useStore();
 const socket = io()
 
 class ChatPage extends React.Component {
@@ -49,7 +47,8 @@ class ChatPage extends React.Component {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name: store().name }),
+      // TODO: replace store.name with redux store
+      // body: JSON.stringify({ name: store().name }),
     });
   }
 
@@ -108,7 +107,8 @@ class ChatPage extends React.Component {
         <PostForm />
         <form>
           <label>
-            logged in as  <h5 class="mb-1">{store().name}</h5>
+            {/* TODO: replace store.name with redux.store
+            logged in as  <h5 class="mb-1">{store().name}</h5> */}
           </label>
           <button class="btn btn-outline-danger btn-sm breathe" onClick={this.handleLogout}> Leave</button>
         </form>
@@ -121,7 +121,8 @@ class ChatPage extends React.Component {
           open={this.state.open}
         >
           <Alert variant="outlined" severity="info">
-            {this.state.lastLogin === store().name ? "You have logged in succesfully" : this.state.lastLogin + " has logged in"}
+            {/* TODO: replace store.name with redux.store
+            {this.state.lastLogin === store().name ? "You have logged in succesfully" : this.state.lastLogin + " has logged in"} */}
           </Alert>
         </Snackbar>
       </div>
