@@ -1,4 +1,6 @@
 import React from 'react';
+import { connect } from "react-redux";
+
 
 class NameForm extends React.Component {
   constructor(props) {
@@ -58,4 +60,4 @@ class NameForm extends React.Component {
   }
 }
 
-export default NameForm;
+export default connect()(NameForm);

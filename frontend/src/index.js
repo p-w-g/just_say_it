@@ -20,6 +20,7 @@ function reducer(state = initialState, action) {
     case "LOG_OUT":
       return { loggedIn: false }
     case "USER_NAME":
+      return { username: 'text' }
 
     default:
       return state

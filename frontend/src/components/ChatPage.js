@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from "react-redux";
 import io from 'socket.io-client'
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
@@ -130,4 +131,4 @@ class ChatPage extends React.Component {
   }
 }
 
-export default ChatPage;
+export default connect()(ChatPage);
