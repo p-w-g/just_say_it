@@ -1,3 +1,8 @@
+import React from 'react';
+import io from 'socket.io-client'
+
+const socket = io()
+
 class PostForm extends React.Component {
   constructor(props) {
     super(props);

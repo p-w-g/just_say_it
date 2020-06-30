@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from "react-redux";
 import NameForm from './NameForm'
 import ChatPage from './ChatPage'
 
@@ -30,6 +31,8 @@ class LoginHandler extends Component {
     );
   }
 }
+const mapStateToProps = state => ({
+  isLoggedIn: state.isLoggedIn
+})
 
-
-export default LoginHandler;
+export default connect()(LoginHandler);
