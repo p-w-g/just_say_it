@@ -6,7 +6,7 @@ import { createStore } from "redux";
 import { Provider } from "react-redux";
 import LoginHandler from './components/LoginHandler'
 import './App.css';
-// import { * } from './store/actions';
+import { userName, logIn, logOut } from './store/actions';
 
 const initialState = {
   username: '',
@@ -16,11 +16,11 @@ const initialState = {
 function reducer(state = initialState, action) {
   switch (action.type) {
     case "LOG_IN":
-      return { loggedIn: true }
+      return { isLoggedIn: true }
     case "LOG_OUT":
-      return { loggedIn: false }
+      return { isLoggedIn: false }
     case "USER_NAME":
-      return { username: 'text' }
+      return { userName: action.text }
 
     default:
       return state
@@ -28,7 +28,8 @@ function reducer(state = initialState, action) {
 }
 
 const store = createStore(reducer)
-
+// console.log
+const unsubscribe = store.subscribe(() => console.log(store.getState()))
 const App = () => {
   return (
     <Provider store={store}>
