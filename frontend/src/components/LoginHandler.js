@@ -1,19 +1,21 @@
-import React, { Component } from 'react';
-import { connect } from "react-redux";
+import React from 'react';
+import { connect, useSelector } from "react-redux";
+
 import NameForm from './NameForm'
 import ChatPage from './ChatPage'
-import { useStore } from 'react-redux'
-
 
 const LoginHandler = () => {
-  const store = useStore()
-  console.log(store.getState())
-  return <div class="container-fluid d-flex justify-content-center align-items-center">
-    {
-      store.getState().isLoggedIn ? <ChatPage />
-        : <NameForm />
-    }
-  </div>
+
+  const logState = useSelector(state => state.isLoggedIn)
+  return (
+    <div class="container-fluid d-flex justify-content-center align-items-center" >
+      {
+        logState ? <ChatPage />
+          : <NameForm />
+      }
+    </div >
+  )
+
 }
 
 export default connect()(LoginHandler);
