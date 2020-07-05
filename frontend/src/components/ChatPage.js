@@ -1,39 +1,48 @@
-import React from 'react';
-import { connect } from "react-redux";
+import React, { useState, useEffect } from 'react';
+import { connect, useStore } from "react-redux";
 import io from 'socket.io-client'
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
-import PostForm from './PostForm'
+
+import { logOut } from '../store/actions';
 
 const socket = io()
 
-class ChatPage extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isLoading: true,
-      open: false,
-      setSnackOpen: true,
-      lastLogin: ''
-    }
-    this.handleLogout = this.handleLogout.bind(this);
+const ChatPage = ({ dispatch }) => {
+
+  const [isLoading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [snackOpen, setSnackOpen] = useState(true);
+  const [allMessages, setAllMessages] = useState('');
+
+  const store = useStore()
+  const storedName = store.getState().userName
+  const name = storedName
+
+  let lastLogin = ''
+
+  useEffect(() => {
+    initSocket()
+    fetchAllMessages()
+    scrollToBottom()
+  }, [])
+
+  const handleLogout = () => {
+    dispatch(logOut())
+    signOut()
   }
 
-  componentDidMount() {
-    this.fetchAllMessages()
-    this.initSocket()
-  };
-
-  componentDidUpdate() {
-    this.scrollToBottom()
+  const signOut = async () => {
+    await fetch('/api/names', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name: name }),
+    });
   }
 
-  handleLogout() {
-    this.props.forceLogout()
-    this.signOut()
-  }
-
-  scrollToBottom = () => {
+  const scrollToBottom = () => {
     if (
       document.querySelectorAll(".chat-message").length !== 0
     ) {
@@ -42,93 +51,98 @@ class ChatPage extends React.Component {
     }
   }
 
-  signOut = async () => {
-    await fetch('/api/names', {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      // TODO: replace store.name with redux store
-      // body: JSON.stringify({ name: store().name }),
-    });
-  }
-
-  fetchAllMessages = async () => {
+  const fetchAllMessages = async () => {
     const response = await fetch('/api/messages');
     const body = await response.json();
 
     if (response.status !== 200) throw Error(body.message);
-    this.setState({ allMessages: body.dataset, isLoading: false })
+
+    setAllMessages(body.dataset)
+    setLoading(false)
   }
 
-  initSocket = () => {
+  const initSocket = () => {
     socket.on('connect', () => {
       console.log("init of socket.io in postform");
     })
 
     socket.on('all-messages', (msgs) => {
-      this.setState({
-        allMessages: msgs.dataset
-      })
+      setAllMessages(msgs.dataset)
+      scrollToBottom()
     })
 
     socket.on('user-login', (payload) => {
-      this.setState({ open: "true", lastLogin: payload.name })
-      this.handleClose()
+      setOpen(true)
+      setSnackOpen(true)
+      lastLogin = payload.name
+      handleClose()
     })
   }
 
-  handleClose = (event, reason) => {
+  const postThePost = async content => {
+    socket.emit('chat message', ({ name: name, message: document.querySelector('#chat-input').value }))
+  }
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    await postThePost()
+
+    document.querySelector('#chat-input').value = '';
+  }
+
+  const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
-    if (this.state.open) {
+    if ({ open }) {
       setTimeout(() => {
-        this.setState({ setSnackOpen: false });
-        this.setState({ open: false });
+        setOpen(false)
+        setSnackOpen(false)
       }, 6000);
     }
-    this.setState({ setSnackOpen: false });
+    setSnackOpen(false)
   };
 
-  render() {
-    return (
-      <div class="col-lg-6 col-12 col-md-10 col-sm-12">
+  return (
+    <div class="col-lg-6 col-12 col-md-10 col-sm-12">
 
-        <ul class="list-group list-group-flush message-feed">
+      <ul class="list-group list-group-flush message-feed">
 
-          {!this.state.isLoading &&
-            this.state.allMessages.map((post, index) =>
-              <li class="list-group-item chat-message" key={index}>
-                <h5 class="mb-1">{post.name}</h5>
-                <p class="mb-1">{post.message}</p>
-              </li>
-            )}
-        </ul>
-        <PostForm />
-        <form>
-          <label>
-            {/* TODO: replace store.name with redux.store
-            logged in as  <h5 class="mb-1">{store().name}</h5> */}
-          </label>
-          <button class="btn btn-outline-danger btn-sm breathe" onClick={this.handleLogout}> Leave</button>
-        </form>
+        {!isLoading &&
+          allMessages.map((post, index) =>
+            <li class="list-group-item chat-message" key={index}>
+              <h5 class="mb-1">{post.name}</h5>
+              <p class="mb-1">{post.message}</p>
+            </li>
+          )}
+      </ul>
+      <form onSubmit={handleSubmit} class="">
+        <label>
+          <input class="form-control form-control-sm" id="chat-input" />
+        </label>
+        <input type="submit" value="Send" class="btn btn-outline-info btn-sm btn-fix" />
+      </form>
+      <form>
+        <label>
+          Logged in as  <h5 class="mb-1">{name}</h5>
+        </label>
+        <button class="btn btn-outline-danger btn-sm breathe" onClick={handleLogout}> Leave</button>
+      </form>
 
-        <Snackbar
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right',
-          }}
-          open={this.state.open}
-        >
-          <Alert variant="outlined" severity="info">
-            {/* TODO: replace store.name with redux.store
-            {this.state.lastLogin === store().name ? "You have logged in succesfully" : this.state.lastLogin + " has logged in"} */}
-          </Alert>
-        </Snackbar>
-      </div>
-    );
-  }
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        open={open}
+      >
+        <Alert variant="outlined" severity="info">
+          {name === lastLogin ? "You have logged in succesfully" : name + " has logged in"}
+        </Alert>
+      </Snackbar>
+    </div>
+  );
 }
 
 export default connect()(ChatPage);
